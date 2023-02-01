@@ -341,7 +341,7 @@ class DeformableTransformerDecoderLayer(nn.Module):
         tgt2, Q_weights = self.self_attn(q.transpose(0, 1), k.transpose(0, 1), tgt.transpose(0, 1))
         tgt2 = tgt2.transpose(0, 1)
 
-        print(F.cross_entropy(Q_weights, Q_weights).sum(-1).mean())
+        print(F.cross_entropy(Q_weights, Q_weights).sum(-1).mean().detach().cpu().numpy())
 
         q = k = tgt
         _, C_weights = self.self_attn(q.transpose(0, 1), k.transpose(0, 1), tgt.transpose(0, 1))
