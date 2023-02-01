@@ -340,7 +340,7 @@ class DeformableTransformerDecoderLayer(nn.Module):
         tgt2, Q_weights = self.self_attn(q.transpose(0, 1), k.transpose(0, 1), tgt.transpose(0, 1))
         tgt2 = tgt2.transpose(0, 1)
 
-        print(Q_weights.max(), Q_weights.min(), Q_weights.avg())
+        print(Q_weights.max(), Q_weights.min(), Q_weights.mean())
 
         q = k = tgt
         _, C_weights = self.self_attn(q.transpose(0, 1), k.transpose(0, 1), tgt.transpose(0, 1))
