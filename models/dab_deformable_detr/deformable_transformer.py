@@ -343,16 +343,16 @@ class DeformableTransformerDecoderLayer(nn.Module):
 
         print(Q_weights.max().detach().cpu().numpy(), Q_weights.min().detach().cpu().numpy(), Q_weights.mean().detach().cpu().numpy())
 
-        q = k = tgt
-        _, C_weights = self.self_attn(q.transpose(0, 1), k.transpose(0, 1), tgt.transpose(0, 1))
-        q = k = query_pos
-        _, P_weights = self.self_attn(q.transpose(0, 1), k.transpose(0, 1), tgt.transpose(0, 1))
-
-        N, Q, _ = Q_weights.shape
-        Q_C = torch.bmm(F.normalize(Q_weights.flatten(1)).unsqueeze(-2), F.normalize(C_weights.flatten(1)).unsqueeze(-1)).mean()
-        Q_P = torch.bmm(F.normalize(Q_weights.flatten(1)).unsqueeze(-2), F.normalize(P_weights.flatten(1)).unsqueeze(-1)).mean()
-
-        print(Q_C.detach().cpu().numpy(), Q_P.detach().cpu().numpy())
+        # q = k = tgt
+        # _, C_weights = self.self_attn(q.transpose(0, 1), k.transpose(0, 1), tgt.transpose(0, 1))
+        # q = k = query_pos
+        # _, P_weights = self.self_attn(q.transpose(0, 1), k.transpose(0, 1), tgt.transpose(0, 1))
+        #
+        # N, Q, _ = Q_weights.shape
+        # Q_C = torch.bmm(F.normalize(Q_weights.flatten(1)).unsqueeze(-2), F.normalize(C_weights.flatten(1)).unsqueeze(-1)).mean()
+        # Q_P = torch.bmm(F.normalize(Q_weights.flatten(1)).unsqueeze(-2), F.normalize(P_weights.flatten(1)).unsqueeze(-1)).mean()
+        #
+        # print(Q_C.detach().cpu().numpy(), Q_P.detach().cpu().numpy())
 
         tgt = tgt + self.dropout2(tgt2)
         tgt = self.norm2(tgt)
