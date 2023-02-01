@@ -133,7 +133,6 @@ class Transformer(nn.Module):
         return hs, references
 
 
-
 class TransformerEncoder(nn.Module):
 
     def __init__(self, encoder_layer, num_layers, norm=None, d_model=256):
