@@ -8,14 +8,15 @@ from datasets import build_dataset
 from util.visualizer import COCOVisualizer
 from util import box_ops
 
-# model_config_path = "model_zoo/DAB_DETR/R50/config.json" # change the path of the model config file
-# model_checkpoint_path = "model_zoo/DAB_DETR/R50/checkpoint.pth" # change the path of the model checkpoint
-model_config_path = "DABDETR_model_zoo/DAB_Deformable_DETR/R50_v2/config.json" # change the path of the model config file
-model_checkpoint_path = "DABDETR_model_zoo/DAB_Deformable_DETR/R50_v2/checkpoint.pth" # change the path of the model checkpoint
+model_config_path = "DABDETR_model_zoo/DAB_DETR/R50_pat3/config.json" # change the path of the model config file
+model_checkpoint_path = "DABDETR_model_zoo/DAB_DETR/R50_pat3/checkpoint.pth" # change the path of the model checkpoint
+# model_config_path = "DABDETR_model_zoo/DAB_Deformable_DETR/R50_v2/config.json" # change the path of the model config file
+# model_checkpoint_path = "DABDETR_model_zoo/DAB_Deformable_DETR/R50_v2/checkpoint.pth" # change the path of the model checkpoint
 # See our Model Zoo section in README.md for more details about our pretrained models.
 
 args = SLConfig.fromfile(model_config_path)
-model, criterion, postprocessors = build_dab_deformable_detr(args)
+model, criterion, postprocessors = build_DABDETR(args)
+# model, criterion, postprocessors = build_dab_deformable_detr(args)
 # checkpoint = torch.load(model_checkpoint_path, map_location='cpu')
 checkpoint = torch.load(model_checkpoint_path)
 model.load_state_dict(checkpoint['model'])
