@@ -348,8 +348,8 @@ class DeformableTransformerDecoderLayer(nn.Module):
         _, P_weights = self.self_attn(q.transpose(0, 1), k.transpose(0, 1), tgt.transpose(0, 1))
 
         N, Q, _ = Q_weights.shape
-        Q_C = torch.bmm(Q_weights.flatten(1).unsqueeze(-2), C_weights.flatten(1).unsqueeze(-1)).mean()
-        Q_P = torch.bmm(Q_weights.flatten(1).unsqueeze(-2), P_weights.flatten(1).unsqueeze(-1)).mean()
+        Q_C = torch.bmm(F.normalize(Q_weights.flatten(1)).unsqueeze(-2), F.normalize(C_weights.flatten(1)).unsqueeze(-1)).mean()
+        Q_P = torch.bmm(F.normalize(Q_weights.flatten(1)).unsqueeze(-2), F.normalize(P_weights.flatten(1)).unsqueeze(-1)).mean()
 
         print(Q_C.detach().cpu().numpy(), Q_P.detach().cpu().numpy())
 
