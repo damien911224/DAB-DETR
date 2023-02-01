@@ -16,7 +16,7 @@ model_checkpoint_path = "DABDETR_model_zoo/DAB_Deformable_DETR/R50_v2/checkpoint
 
 args = SLConfig.fromfile(model_config_path)
 model, criterion, postprocessors = build_dab_deformable_detr(args)
-checkpoint = torch.load(model_checkpoint_path, map_location='cpu')
+checkpoint = torch.load(model_checkpoint_path, map_location='cuda')
 model.load_state_dict(checkpoint['model'])
 
 from PIL import Image
