@@ -35,5 +35,5 @@ transform = T.Compose([
 image, _ = transform(image, None)
 
 # predict images
-output = model(image[None])
+output = model(image[None].cuda())
 output = postprocessors['bbox'](output, torch.Tensor([[1.0, 1.0]]))[0]
