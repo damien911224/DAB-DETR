@@ -18,6 +18,7 @@ args = SLConfig.fromfile(model_config_path)
 model, criterion, postprocessors = build_dab_deformable_detr(args)
 checkpoint = torch.load(model_checkpoint_path, map_location='cpu')
 model.load_state_dict(checkpoint['model'])
+model = model.cuda()
 
 from PIL import Image
 import datasets.transforms as T
