@@ -10,8 +10,8 @@ from util import box_ops
 
 # model_config_path = "model_zoo/DAB_DETR/R50/config.json" # change the path of the model config file
 # model_checkpoint_path = "model_zoo/DAB_DETR/R50/checkpoint.pth" # change the path of the model checkpoint
-model_config_path = "/Users/damien/Downloads/DAB_Deformable_DETR/R50_v2/config.json" # change the path of the model config file
-model_checkpoint_path = "/Users/damien/Downloads/DAB_Deformable_DETR/R50_v2/checkpoint.pth" # change the path of the model checkpoint
+model_config_path = "DAB_Deformable_DETR/R50_v2/config.json" # change the path of the model config file
+model_checkpoint_path = "DAB_Deformable_DETR/R50_v2/checkpoint.pth" # change the path of the model checkpoint
 # See our Model Zoo section in README.md for more details about our pretrained models.
 
 args = SLConfig.fromfile(model_config_path)
