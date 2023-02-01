@@ -36,4 +36,4 @@ image, _ = transform(image, None)
 
 # predict images
 output = model(image[None].cuda())
-output = postprocessors['bbox'](output, torch.Tensor([[1.0, 1.0]]))[0]
+# output = postprocessors['bbox'](output, torch.Tensor([[1.0, 1.0]]))[0]
