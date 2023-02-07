@@ -315,8 +315,11 @@ class TransformerEncoderLayer(nn.Module):
                      src_key_padding_mask: Optional[Tensor] = None,
                      pos: Optional[Tensor] = None):
         q = k = self.with_pos_embed(src, pos)
-        src2 = self.self_attn(q, k, value=src, attn_mask=src_mask,
-                              key_padding_mask=src_key_padding_mask)[0]
+        src2, K_weights = self.self_attn(q, k, value=src, attn_mask=src_mask,
+                                         key_padding_mask=src_key_padding_mask)
+
+        print(torch.argsort(-K_weights[0].detach().cpu(), dim=-1)[:10, :10].numpy())
+
         src = src + self.dropout1(src2)
         src = self.norm1(src)
         src2 = self.linear2(self.dropout(self.activation(self.linear1(src))))
@@ -403,9 +406,9 @@ class TransformerDecoderLayer(nn.Module):
             # ========== End of Self-Attention =============
 
             # print(torch.argsort(-Q_weights[0].detach().cpu(), dim=-1)[:10, :10].numpy())
-            Q_weights = Q_weights.detach().cpu()
+            # Q_weights = Q_weights.detach().cpu()
             # print(torch.argsort(-Q_weights[0, 0].detach().cpu(), dim=-1)[:10].numpy())
-            print(Q_weights[0, 0][torch.argsort(-Q_weights[0, 0], dim=-1)[:10]].numpy())
+            # print(Q_weights[0, 0][torch.argsort(-Q_weights[0, 0], dim=-1)[:10]].numpy())
 
             # print(F.cross_entropy(Q_weights, Q_weights).sum(-1).mean().detach().cpu().numpy())
 
