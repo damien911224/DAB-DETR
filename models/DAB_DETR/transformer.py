@@ -406,6 +406,9 @@ class TransformerDecoderLayer(nn.Module):
             tgt2, Q_weights = self.self_attn(q, k, value=v, attn_mask=tgt_mask, key_padding_mask=tgt_key_padding_mask)
             # ========== End of Self-Attention =============
 
+            print(torch.argsort(-Q_weights[0].detach().cpu(), dim=-1)[:10, :10].numpy())
+            print(torch.max(Q_weights[0].detach().cpu(), dim=-1)[0][:10].numpy())
+
             # print(torch.argsort(-Q_weights[0].detach().cpu(), dim=-1)[:10, :10].numpy())
             # Q_weights = Q_weights.detach().cpu()
             # print(torch.argsort(-Q_weights[0, 0].detach().cpu(), dim=-1)[:10].numpy())
