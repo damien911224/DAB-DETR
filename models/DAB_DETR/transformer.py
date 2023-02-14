@@ -21,6 +21,9 @@ import torch.nn.functional as F
 from torch import nn, Tensor
 from .attention import MultiheadAttention
 
+global layer_count
+layer_count = 0
+
 class MLP(nn.Module):
     """ Very simple multi-layer perceptron (also called FFN)"""
 
@@ -320,6 +323,33 @@ class TransformerEncoderLayer(nn.Module):
 
         print(torch.argsort(-K_weights[0].detach().cpu(), dim=-1)[:10, :10].numpy())
         print(torch.max(K_weights[0].detach().cpu(), dim=-1)[0][:10].numpy())
+
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+        mma = K_weights[0].detach().cpu()
+        fig, ax = plt.subplots()
+        heatmap = ax.pcolor(mma, cmap=plt.cm.Reds)
+        # put the major ticks at the middle of each cell
+        ax.set_xticks(numpy.arange(mma.shape[1]) + 0.5, minor=False)
+        ax.set_yticks(numpy.arange(mma.shape[0]) + 0.5, minor=False)
+
+        ax.set_xlim(0, int(mma.shape[1]))
+        ax.set_ylim(0, int(mma.shape[0]))
+
+        ax.invert_yaxis()
+        ax.xaxis.tick_top()
+
+        # ax.set_xticklabels(source_labels, minor=False)
+        # ax.set_yticklabels(target_labels, minor=False)
+        # plt.xticks(rotation=45)
+
+        global layer_count
+        plt.savefig("{}.png".format(layer_count + 1))
+        layer_count += 1
+        # fig.canvas.draw()
+        # vis_array = np.array(fig.canvas.renderer._renderer)
+        plt.close(fig)
 
         src = src + self.dropout1(src2)
         src = self.norm1(src)
