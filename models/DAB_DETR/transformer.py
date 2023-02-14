@@ -24,6 +24,7 @@ from .attention import MultiheadAttention
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import numpy as np
 
 global layer_count
 layer_count = 0
