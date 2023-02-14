@@ -332,8 +332,8 @@ class TransformerEncoderLayer(nn.Module):
         fig, ax = plt.subplots()
         heatmap = ax.pcolor(mma, cmap=plt.cm.Reds)
         # put the major ticks at the middle of each cell
-        ax.set_xticks(numpy.arange(mma.shape[1]) + 0.5, minor=False)
-        ax.set_yticks(numpy.arange(mma.shape[0]) + 0.5, minor=False)
+        ax.set_xticks(np.arange(mma.shape[1]) + 0.5, minor=False)
+        ax.set_yticks(np.arange(mma.shape[0]) + 0.5, minor=False)
 
         ax.set_xlim(0, int(mma.shape[1]))
         ax.set_ylim(0, int(mma.shape[0]))
