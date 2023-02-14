@@ -328,7 +328,7 @@ class TransformerEncoderLayer(nn.Module):
         # print(torch.argsort(-K_weights[0].detach().cpu(), dim=-1)[:10, :10].numpy())
         # print(torch.max(K_weights[0].detach().cpu(), dim=-1)[0][:10].numpy())
 
-        mma = K_weights[0].detach().cpu()
+        mma = K_weights[0].detach().cpu().numpy()
         fig, ax = plt.subplots()
         heatmap = ax.pcolor(mma, cmap=plt.cm.Reds)
         # put the major ticks at the middle of each cell
