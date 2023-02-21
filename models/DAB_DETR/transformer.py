@@ -361,7 +361,7 @@ class TransformerEncoderLayer(nn.Module):
         # df = pd.DataFrame(K_weights)
         # df.to_csv("K_{:02d}.csv".format(layer_count + 1), index=False)
 
-        map = K_weights
+        map = K_weights[:100, :100]
         H, W = map.shape
         H_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
         W_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
