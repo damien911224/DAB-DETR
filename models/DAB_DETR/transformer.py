@@ -362,7 +362,7 @@ class TransformerEncoderLayer(nn.Module):
 
         # print(K_weights.shape)
         # exit()
-        map = K_weights.view(38, 25, 38, 25).mean(dim=(1, 2)).numpy()
+        map = K_weights.view(38, 25, 38, 25).mean(dim=(1, -1)).numpy()
         H, W = map.shape
         H_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
         W_labels = ["{}".format(x) for x in range(1, W + 1, 1)]
@@ -375,7 +375,7 @@ class TransformerEncoderLayer(nn.Module):
         # ax.set_xticklabels(tl, rotation=90)
         # tly = ax.get_yticklabels()
         # ax.set_yticklabels(tly, rotation=0)
-        plt.savefig("K_{:02d}.png".format(layer_count))
+        plt.savefig("KH_{:02d}.png".format(layer_count))
         plt.close()
 
         src = src + self.dropout1(src2)
