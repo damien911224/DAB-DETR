@@ -123,12 +123,14 @@ class Transformer(nn.Module):
     def forward(self, src, mask, refpoint_embed, pos_embed):
         # flatten NxCxHxW to HWxNxC
         bs, c, h, w = src.shape
+        print(src.shape)
         src = src.flatten(2).permute(2, 0, 1)
         pos_embed = pos_embed.flatten(2).permute(2, 0, 1)
         refpoint_embed = refpoint_embed.unsqueeze(1).repeat(1, bs, 1)
         mask = mask.flatten(1)        
         memory = self.encoder(src, src_key_padding_mask=mask, pos=pos_embed)
         print(memory.shape)
+        exit()
 
         # query_embed = gen_sineembed_for_position(refpoint_embed)
         num_queries = refpoint_embed.shape[0]
