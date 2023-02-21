@@ -358,8 +358,24 @@ class TransformerEncoderLayer(nn.Module):
 
         layer_count += 1
         K_weights = K_weights[0].detach().cpu().numpy()
-        df = pd.DataFrame(K_weights)
-        df.to_csv("K_{:02d}.csv".format(layer_count + 1), index=False)
+        # df = pd.DataFrame(K_weights)
+        # df.to_csv("K_{:02d}.csv".format(layer_count + 1), index=False)
+
+        map = K_weights
+        H, W = map.shape
+        H_labels = ["{}".format(x) for x in range(1, H + 1, 1)] + [""] + ["GT"] * (H // 40)
+        W_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
+        map -= np.min(map)
+        map /= np.max(map)
+        map = np.concatenate((map, KK_box), axis=0)
+        df = pd.DataFrame(map, H_labels, W_labels)
+        ax = sn.heatmap(df, cmap="YlGnBu")
+        ax.set(xlabel="", ylabel="")
+        tl = ax.get_xticklabels()
+        ax.set_xticklabels(tl, rotation=90)
+        tly = ax.get_yticklabels()
+        ax.set_yticklabels(tly, rotation=0)
+        ax.save_fig("K_{:02d}.png".format(layer_count + 1))
 
         src = src + self.dropout1(src2)
         src = self.norm1(src)
