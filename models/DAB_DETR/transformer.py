@@ -491,7 +491,7 @@ class TransformerDecoderLayer(nn.Module):
             global layer_count
             layer_count += 1
             Q_weights = Q_weights[0].detach().cpu().numpy()
-            map = Q_weights
+            map = Q_weights[:100, :100]
             H, W = map.shape
             H_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
             W_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
