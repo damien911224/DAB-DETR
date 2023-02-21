@@ -128,6 +128,7 @@ class Transformer(nn.Module):
         refpoint_embed = refpoint_embed.unsqueeze(1).repeat(1, bs, 1)
         mask = mask.flatten(1)        
         memory = self.encoder(src, src_key_padding_mask=mask, pos=pos_embed)
+        print(memory.shape)
 
         # query_embed = gen_sineembed_for_position(refpoint_embed)
         num_queries = refpoint_embed.shape[0]
