@@ -356,29 +356,29 @@ class TransformerEncoderLayer(nn.Module):
         # # vis_array = np.array(fig.canvas.renderer._renderer)
         # plt.close(fig)
 
-        # global layer_count
-        # layer_count += 1
-        # K_weights = K_weights[0].detach().cpu().numpy()
+        global layer_count
+        layer_count += 1
+        K_weights = K_weights[0].detach().cpu().numpy()
         # df = pd.DataFrame(K_weights)
         # df.to_csv("K_{:02d}.csv".format(layer_count + 1), index=False)
 
         # print(K_weights.shape)
         # exit()
-        # map = K_weights[:100, :100]
-        # H, W = map.shape
-        # H_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
-        # W_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
-        # map -= np.min(map)
-        # map /= np.max(map)
-        # df = pd.DataFrame(map, H_labels, W_labels)
-        # ax = sn.heatmap(df)
+        map = K_weights[:100, :100]
+        H, W = map.shape
+        H_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
+        W_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
+        map -= np.min(map)
+        map /= np.max(map)
+        df = pd.DataFrame(map, H_labels, W_labels)
+        ax = sn.heatmap(df, cbar=False, xticklabels=False, yticklabels=False, square=True)
         # ax.set(xlabel="", ylabel="")
         # tl = ax.get_xticklabels()
         # ax.set_xticklabels(tl, rotation=90)
         # tly = ax.get_yticklabels()
         # ax.set_yticklabels(tly, rotation=0)
-        # plt.savefig("K_{:02d}.png".format(layer_count))
-        # plt.close()
+        plt.savefig("K_{:02d}.png".format(layer_count))
+        plt.close()
 
         src = src + self.dropout1(src2)
         src = self.norm1(src)
