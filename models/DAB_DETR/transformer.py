@@ -329,29 +329,33 @@ class TransformerEncoderLayer(nn.Module):
         # print(torch.argsort(-K_weights[0].detach().cpu(), dim=-1)[:10, :10].numpy())
         # print(torch.max(K_weights[0].detach().cpu(), dim=-1)[0][:10].numpy())
 
-        mma = K_weights[0].detach().cpu().numpy()
-        fig, ax = plt.subplots()
-        heatmap = ax.pcolor(mma, cmap=plt.cm.Reds)
-        # put the major ticks at the middle of each cell
-        ax.set_xticks(np.arange(mma.shape[1]) + 0.5, minor=False)
-        ax.set_yticks(np.arange(mma.shape[0]) + 0.5, minor=False)
-
-        ax.set_xlim(0, int(mma.shape[1]))
-        ax.set_ylim(0, int(mma.shape[0]))
-
-        ax.invert_yaxis()
-        ax.xaxis.tick_top()
+        # mma = K_weights[0].detach().cpu().numpy()
+        # fig, ax = plt.subplots()
+        # heatmap = ax.pcolor(mma, cmap=plt.cm.Reds)
+        # # put the major ticks at the middle of each cell
+        # ax.set_xticks(np.arange(mma.shape[1]) + 0.5, minor=False)
+        # ax.set_yticks(np.arange(mma.shape[0]) + 0.5, minor=False)
+        #
+        # ax.set_xlim(0, int(mma.shape[1]))
+        # ax.set_ylim(0, int(mma.shape[0]))
+        #
+        # ax.invert_yaxis()
+        # ax.xaxis.tick_top()
 
         # ax.set_xticklabels(source_labels, minor=False)
         # ax.set_yticklabels(target_labels, minor=False)
         # plt.xticks(rotation=45)
 
-        global layer_count
-        plt.savefig("{}.png".format(layer_count + 1))
-        layer_count += 1
-        # fig.canvas.draw()
-        # vis_array = np.array(fig.canvas.renderer._renderer)
-        plt.close(fig)
+        # global layer_count
+        # plt.savefig("{}.png".format(layer_count + 1))
+        # layer_count += 1
+        # # fig.canvas.draw()
+        # # vis_array = np.array(fig.canvas.renderer._renderer)
+        # plt.close(fig)
+
+        K_weights = K_weights[0].detach().cpu().numpy()
+        df = pd.DataFrame(K_weights)
+        df.to_csv("K_{:02d}.csv".format(layer_count + 1), index=False)
 
         src = src + self.dropout1(src2)
         src = self.norm1(src)
