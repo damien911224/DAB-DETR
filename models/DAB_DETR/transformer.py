@@ -363,7 +363,7 @@ class TransformerEncoderLayer(nn.Module):
 
         map = K_weights
         H, W = map.shape
-        H_labels = ["{}".format(x) for x in range(1, H + 1, 1)] + [""] + ["GT"] * (H // 40)
+        H_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
         W_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
         map -= np.min(map)
         map /= np.max(map)
