@@ -488,6 +488,8 @@ class TransformerDecoderLayer(nn.Module):
             #
             # print(Q_C.detach().cpu().numpy(), Q_P.detach().cpu().numpy())
 
+            global layer_count
+            layer_count += 1
             Q_weights = Q_weights[0].detach().cpu().numpy()
             map = Q_weights
             H, W = map.shape
