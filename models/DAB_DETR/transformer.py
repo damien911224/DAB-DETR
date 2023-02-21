@@ -368,7 +368,7 @@ class TransformerEncoderLayer(nn.Module):
         map -= np.min(map)
         map /= np.max(map)
         df = pd.DataFrame(map, H_labels, W_labels)
-        ax = sn.heatmap(df, cmap="YlGnBu")
+        ax = sn.heatmap(df)
         ax.set(xlabel="", ylabel="")
         tl = ax.get_xticklabels()
         ax.set_xticklabels(tl, rotation=90)
