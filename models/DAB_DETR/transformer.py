@@ -354,30 +354,29 @@ class TransformerEncoderLayer(nn.Module):
         # # vis_array = np.array(fig.canvas.renderer._renderer)
         # plt.close(fig)
 
-        global layer_count
-
-        layer_count += 1
-        K_weights = K_weights[0].detach().cpu().numpy()
+        # global layer_count
+        # layer_count += 1
+        # K_weights = K_weights[0].detach().cpu().numpy()
         # df = pd.DataFrame(K_weights)
         # df.to_csv("K_{:02d}.csv".format(layer_count + 1), index=False)
 
-        print(K_weights.shape)
-        exit()
-        map = K_weights[:100, :100]
-        H, W = map.shape
-        H_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
-        W_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
-        map -= np.min(map)
-        map /= np.max(map)
-        df = pd.DataFrame(map, H_labels, W_labels)
-        ax = sn.heatmap(df)
-        ax.set(xlabel="", ylabel="")
-        tl = ax.get_xticklabels()
-        ax.set_xticklabels(tl, rotation=90)
-        tly = ax.get_yticklabels()
-        ax.set_yticklabels(tly, rotation=0)
-        plt.savefig("K_{:02d}.png".format(layer_count))
-        plt.close()
+        # print(K_weights.shape)
+        # exit()
+        # map = K_weights[:100, :100]
+        # H, W = map.shape
+        # H_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
+        # W_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
+        # map -= np.min(map)
+        # map /= np.max(map)
+        # df = pd.DataFrame(map, H_labels, W_labels)
+        # ax = sn.heatmap(df)
+        # ax.set(xlabel="", ylabel="")
+        # tl = ax.get_xticklabels()
+        # ax.set_xticklabels(tl, rotation=90)
+        # tly = ax.get_yticklabels()
+        # ax.set_yticklabels(tly, rotation=0)
+        # plt.savefig("K_{:02d}.png".format(layer_count))
+        # plt.close()
 
         src = src + self.dropout1(src2)
         src = self.norm1(src)
@@ -464,8 +463,8 @@ class TransformerDecoderLayer(nn.Module):
             tgt2, Q_weights = self.self_attn(q, k, value=v, attn_mask=tgt_mask, key_padding_mask=tgt_key_padding_mask)
             # ========== End of Self-Attention =============
 
-            print(torch.argsort(-Q_weights[0].detach().cpu(), dim=-1)[:10, :10].numpy())
-            print(torch.max(Q_weights[0].detach().cpu(), dim=-1)[0][:10].numpy())
+            # print(torch.argsort(-Q_weights[0].detach().cpu(), dim=-1)[:10, :10].numpy())
+            # print(torch.max(Q_weights[0].detach().cpu(), dim=-1)[0][:10].numpy())
 
             # print(torch.argsort(-Q_weights[0].detach().cpu(), dim=-1)[:10, :10].numpy())
             # Q_weights = Q_weights.detach().cpu()
@@ -488,6 +487,23 @@ class TransformerDecoderLayer(nn.Module):
             #                 F.normalize(P_weights.flatten(1)).unsqueeze(-1)).mean()
             #
             # print(Q_C.detach().cpu().numpy(), Q_P.detach().cpu().numpy())
+
+            Q_weights = Q_weights[0].detach().cpu().numpy()
+            map = Q_weights
+            H, W = map.shape
+            H_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
+            W_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
+            map -= np.min(map)
+            map /= np.max(map)
+            df = pd.DataFrame(map, H_labels, W_labels)
+            ax = sn.heatmap(df)
+            ax.set(xlabel="", ylabel="")
+            tl = ax.get_xticklabels()
+            ax.set_xticklabels(tl, rotation=90)
+            tly = ax.get_yticklabels()
+            ax.set_yticklabels(tly, rotation=0)
+            plt.savefig("Q_{:02d}.png".format(layer_count))
+            plt.close()
 
             tgt = tgt + self.dropout1(tgt2)
             tgt = self.norm1(tgt)
