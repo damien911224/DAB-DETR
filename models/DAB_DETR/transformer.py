@@ -374,7 +374,7 @@ class TransformerEncoderLayer(nn.Module):
         ax.set_xticklabels(tl, rotation=90)
         tly = ax.get_yticklabels()
         ax.set_yticklabels(tly, rotation=0)
-        plt.savefig("K_{:02d}.png".format(layer_count + 1))
+        plt.savefig("K_{:02d}.png".format(layer_count))
         plt.close()
 
         src = src + self.dropout1(src2)
