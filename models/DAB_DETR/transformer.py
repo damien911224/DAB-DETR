@@ -492,25 +492,25 @@ class TransformerDecoderLayer(nn.Module):
             #
             # print(Q_C.detach().cpu().numpy(), Q_P.detach().cpu().numpy())
 
-            global layer_count
-            layer_count += 1
-            Q_weights = Q_weights[0].detach().cpu().numpy()
-            map = Q_weights[:100, :100]
-            H, W = map.shape
-            H_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
-            W_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
-            map -= np.min(map)
-            map /= np.max(map)
+            # global layer_count
+            # layer_count += 1
+            # Q_weights = Q_weights[0].detach().cpu().numpy()
+            # map = Q_weights[:100, :100]
+            # H, W = map.shape
+            # H_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
+            # W_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
+            # map -= np.min(map)
+            # map /= np.max(map)
+            # # df = pd.DataFrame(map, H_labels, W_labels)
             # df = pd.DataFrame(map, H_labels, W_labels)
-            df = pd.DataFrame(map, H_labels, W_labels)
-            ax = sn.heatmap(df, cbar=False, xticklabels=False, yticklabels=False, square=True)
-            # ax.set(xlabel="", ylabel="")
-            # tl = ax.get_xticklabels()
-            # ax.set_xticklabels(tl, rotation=90)
-            # tly = ax.get_yticklabels()
-            # ax.set_yticklabels(tly, rotation=0)
-            plt.savefig("Q_{:02d}.png".format(layer_count))
-            plt.close()
+            # ax = sn.heatmap(df, cbar=False, xticklabels=False, yticklabels=False, square=True)
+            # # ax.set(xlabel="", ylabel="")
+            # # tl = ax.get_xticklabels()
+            # # ax.set_xticklabels(tl, rotation=90)
+            # # tly = ax.get_yticklabels()
+            # # ax.set_yticklabels(tly, rotation=0)
+            # plt.savefig("Q_{:02d}.png".format(layer_count))
+            # plt.close()
 
             tgt = tgt + self.dropout1(tgt2)
             tgt = self.norm1(tgt)
