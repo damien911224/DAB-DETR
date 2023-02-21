@@ -354,6 +354,7 @@ class TransformerEncoderLayer(nn.Module):
         # # vis_array = np.array(fig.canvas.renderer._renderer)
         # plt.close(fig)
 
+        layer_count += 1
         K_weights = K_weights[0].detach().cpu().numpy()
         df = pd.DataFrame(K_weights)
         df.to_csv("K_{:02d}.csv".format(layer_count + 1), index=False)
