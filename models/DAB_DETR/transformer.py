@@ -354,31 +354,31 @@ class TransformerEncoderLayer(nn.Module):
         # # vis_array = np.array(fig.canvas.renderer._renderer)
         # plt.close(fig)
 
-        global layer_count
-        layer_count += 1
-        K_weights = K_weights[0].detach().cpu()
-        # df = pd.DataFrame(K_weights)
-        # df.to_csv("K_{:02d}.csv".format(layer_count + 1), index=False)
-
-        # map = K_weights.view(25, 34, 25, 34).mean(dim=0).sum(dim=1)
-        # map = K_weights.view(25, 34, 25, 34).mean(dim=1).sum(dim=2)
-        # map = map / torch.sum(map, dim=-1, keepdim=True)
-        map = K_weights
-        map = map.numpy()
-        H, W = map.shape
-        H_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
-        W_labels = ["{}".format(x) for x in range(1, W + 1, 1)]
-        # map -= np.min(map)
-        # map /= np.max(map)
-        df = pd.DataFrame(map, H_labels, W_labels)
-        ax = sn.heatmap(df, cbar=True, xticklabels=False, yticklabels=False, square=True)
-        # ax.set(xlabel="", ylabel="")
-        # tl = ax.get_xticklabels()
-        # ax.set_xticklabels(tl, rotation=90)
-        # tly = ax.get_yticklabels()
-        # ax.set_yticklabels(tly, rotation=0)
-        plt.savefig("K_{:02d}.png".format(layer_count))
-        plt.close()
+        # global layer_count
+        # layer_count += 1
+        # K_weights = K_weights[0].detach().cpu()
+        # # df = pd.DataFrame(K_weights)
+        # # df.to_csv("K_{:02d}.csv".format(layer_count + 1), index=False)
+        #
+        # # map = K_weights.view(25, 34, 25, 34).mean(dim=0).sum(dim=1)
+        # # map = K_weights.view(25, 34, 25, 34).mean(dim=1).sum(dim=2)
+        # # map = map / torch.sum(map, dim=-1, keepdim=True)
+        # map = K_weights
+        # map = map.numpy()
+        # H, W = map.shape
+        # H_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
+        # W_labels = ["{}".format(x) for x in range(1, W + 1, 1)]
+        # # map -= np.min(map)
+        # # map /= np.max(map)
+        # df = pd.DataFrame(map, H_labels, W_labels)
+        # ax = sn.heatmap(df, cbar=True, xticklabels=False, yticklabels=False, square=True)
+        # # ax.set(xlabel="", ylabel="")
+        # # tl = ax.get_xticklabels()
+        # # ax.set_xticklabels(tl, rotation=90)
+        # # tly = ax.get_yticklabels()
+        # # ax.set_yticklabels(tly, rotation=0)
+        # plt.savefig("K_{:02d}.png".format(layer_count))
+        # plt.close()
 
         src = src + self.dropout1(src2)
         src = self.norm1(src)
@@ -490,25 +490,25 @@ class TransformerDecoderLayer(nn.Module):
             #
             # print(Q_C.detach().cpu().numpy(), Q_P.detach().cpu().numpy())
 
-            # global layer_count
-            # layer_count += 1
-            # Q_weights = Q_weights[0].detach().cpu().numpy()
-            # map = Q_weights[:100, :100]
-            # H, W = map.shape
-            # H_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
-            # W_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
-            # map -= np.min(map)
-            # map /= np.max(map)
-            # # df = pd.DataFrame(map, H_labels, W_labels)
+            global layer_count
+            layer_count += 1
+            Q_weights = Q_weights[0].detach().cpu().numpy()
+            map = Q_weights[:40, :40]
+            H, W = map.shape
+            H_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
+            W_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
+            map -= np.min(map)
+            map /= np.max(map)
             # df = pd.DataFrame(map, H_labels, W_labels)
-            # ax = sn.heatmap(df, cbar=False, xticklabels=False, yticklabels=False, square=True)
-            # # ax.set(xlabel="", ylabel="")
-            # # tl = ax.get_xticklabels()
-            # # ax.set_xticklabels(tl, rotation=90)
-            # # tly = ax.get_yticklabels()
-            # # ax.set_yticklabels(tly, rotation=0)
-            # plt.savefig("Q_{:02d}.png".format(layer_count))
-            # plt.close()
+            df = pd.DataFrame(map, H_labels, W_labels)
+            ax = sn.heatmap(df, cbar=False, xticklabels=False, yticklabels=False, square=True)
+            # ax.set(xlabel="", ylabel="")
+            # tl = ax.get_xticklabels()
+            # ax.set_xticklabels(tl, rotation=90)
+            # tly = ax.get_yticklabels()
+            # ax.set_yticklabels(tly, rotation=0)
+            plt.savefig("Q_{:02d}.png".format(layer_count))
+            plt.close()
 
             tgt = tgt + self.dropout1(tgt2)
             tgt = self.norm1(tgt)
