@@ -25,8 +25,8 @@ model = model.cuda()
 from PIL import Image
 import datasets.transforms as T
 
-# image = Image.open("./figure/idea.jpg").convert("RGB")
-image = Image.open("./figure/cats.jpg").convert("RGB")
+image = Image.open("./figure/idea.jpg").convert("RGB")
+# image = Image.open("./figure/cats.jpg").convert("RGB")
 
 # transform images
 transform = T.Compose([
