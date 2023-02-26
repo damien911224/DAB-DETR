@@ -123,8 +123,6 @@ class Transformer(nn.Module):
     def forward(self, src, mask, refpoint_embed, pos_embed):
         # flatten NxCxHxW to HWxNxC
         bs, c, h, w = src.shape
-        print(h, w)
-        exit()
         src = src.flatten(2).permute(2, 0, 1)
         pos_embed = pos_embed.flatten(2).permute(2, 0, 1)
         refpoint_embed = refpoint_embed.unsqueeze(1).repeat(1, bs, 1)
@@ -364,7 +362,7 @@ class TransformerEncoderLayer(nn.Module):
 
         # print(K_weights.shape)
         # exit()
-        map = K_weights.view(38, 25, 38, 25).mean(dim=(0, 2)).numpy()
+        map = K_weights.view(25, 34, 25, 34).mean(dim=(0, 2)).numpy()
         H, W = map.shape
         H_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
         W_labels = ["{}".format(x) for x in range(1, W + 1, 1)]
