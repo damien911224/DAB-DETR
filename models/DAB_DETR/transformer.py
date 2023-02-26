@@ -360,7 +360,8 @@ class TransformerEncoderLayer(nn.Module):
         # df = pd.DataFrame(K_weights)
         # df.to_csv("K_{:02d}.csv".format(layer_count + 1), index=False)
 
-        map = K_weights.view(25, 34, 25, 34).mean(dim=0).sum(dim=1)
+        # map = K_weights.view(25, 34, 25, 34).mean(dim=0).sum(dim=1)
+        map = K_weights.view(25, 34, 25, 34).mean(dim=1).sum(dim=2)
         map = map / torch.sum(map, dim=-1, keepdim=True)
         map = map.numpy()
         H, W = map.shape
