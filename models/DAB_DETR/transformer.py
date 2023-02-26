@@ -494,14 +494,14 @@ class TransformerDecoderLayer(nn.Module):
             layer_count += 1
             Q_weights = Q_weights[0].detach().cpu()
 
-            map = Q_weights.view(30, 30, 30, 30).mean(dim=1).sum(dim=2)
+            # map = Q_weights.view(30, 30, 30, 30).mean(dim=1).sum(dim=2)
             # map = Q_weights.view(3, 10, 10, 3, 10, 10).mean(dim=(0, 1)).sum(dim=(1, 2))
             # map = Q_weights.view(3, 100, 3, 100).mean(dim=0).sum(dim=1)
-            map = map / torch.sum(map, dim=-1, keepdim=True)
+            # map = map / torch.sum(map, dim=-1, keepdim=True)
             # map = Q_weights[:40, :]
             # # map = K_weights.view(25, 34, 25, 34).mean(dim=1).sum(dim=2)
             # map = map / torch.sum(map, dim=-1, keepdim=True)
-            # map = K_weights
+            map = Q_weights
 
             map = map.numpy()
 
