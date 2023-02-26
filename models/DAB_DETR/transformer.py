@@ -507,7 +507,7 @@ class TransformerDecoderLayer(nn.Module):
 
             H, W = map.shape
             H_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
-            W_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
+            W_labels = ["{}".format(x) for x in range(1, W + 1, 1)]
             # map -= np.min(map)
             # map /= np.max(map)
             # df = pd.DataFrame(map, H_labels, W_labels)
