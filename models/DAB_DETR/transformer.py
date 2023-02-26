@@ -362,7 +362,7 @@ class TransformerEncoderLayer(nn.Module):
 
         # print(K_weights.shape)
         # exit()
-        map = K_weights.view(25, 34, 25, 34).mean(dim=(0, 2)).numpy()
+        map = K_weights.view(25, 34, 25, 34).mean(dim=0).sum(dim=1).numpy()
         H, W = map.shape
         H_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
         W_labels = ["{}".format(x) for x in range(1, W + 1, 1)]
