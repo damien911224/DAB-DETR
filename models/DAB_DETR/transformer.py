@@ -361,8 +361,9 @@ class TransformerEncoderLayer(nn.Module):
         # df.to_csv("K_{:02d}.csv".format(layer_count + 1), index=False)
 
         # map = K_weights.view(25, 34, 25, 34).mean(dim=0).sum(dim=1)
-        map = K_weights.view(25, 34, 25, 34).mean(dim=1).sum(dim=2)
-        map = map / torch.sum(map, dim=-1, keepdim=True)
+        # map = K_weights.view(25, 34, 25, 34).mean(dim=1).sum(dim=2)
+        # map = map / torch.sum(map, dim=-1, keepdim=True)
+        map = K_weights
         map = map.numpy()
         H, W = map.shape
         H_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
