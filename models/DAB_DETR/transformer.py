@@ -501,7 +501,7 @@ class TransformerDecoderLayer(nn.Module):
             # map /= np.max(map)
             # df = pd.DataFrame(map, H_labels, W_labels)
             df = pd.DataFrame(map, H_labels, W_labels)
-            ax = sn.heatmap(df, cbar=False, xticklabels=False, yticklabels=False, square=True)
+            ax = sn.heatmap(df, cbar=True, xticklabels=False, yticklabels=False, square=True)
             # ax.set(xlabel="", ylabel="")
             # tl = ax.get_xticklabels()
             # ax.set_xticklabels(tl, rotation=90)
