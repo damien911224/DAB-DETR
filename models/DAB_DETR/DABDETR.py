@@ -164,9 +164,7 @@ class DABDETR(nn.Module):
         assert mask is not None
         # default pipeline
         embedweight = self.refpoint_embed.weight
-        hs, reference = self.transformer(self.input_proj(src), mask, embedweight, pos[-1])
-        
-        
+        hs, reference, Q_weights, K_weights, C_weights = self.transformer(self.input_proj(src), mask, embedweight, pos[-1])
         
         if not self.bbox_embed_diff_each_layer:
             reference_before_sigmoid = inverse_sigmoid(reference)
