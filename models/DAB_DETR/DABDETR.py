@@ -589,10 +589,10 @@ def build_DABDETR(args):
     if args.masks:
         losses += ["masks"]
 
-    losses += ["QK", "QQ", "KK"]
-    weight_dict['loss_QK'] = 2.0
-    weight_dict['loss_QQ'] = 2.0
-    weight_dict['loss_KK'] = 2.0
+    # losses += ["QK", "QQ", "KK"]
+    # weight_dict['loss_QK'] = 2.0
+    # weight_dict['loss_QQ'] = 2.0
+    # weight_dict['loss_KK'] = 2.0
 
     criterion = SetCriterion(num_classes, matcher=matcher, weight_dict=weight_dict,
                              focal_alpha=args.focal_alpha, losses=losses)
