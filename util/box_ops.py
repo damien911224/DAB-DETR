@@ -22,8 +22,10 @@ def box_xyxy_to_cxcywh(x):
 
 # modified from torchvision to also return the union
 def box_iou(boxes1, boxes2):
-    area1 = box_area(boxes1)
-    area2 = box_area(boxes2)
+    # area1 = box_area(boxes1)
+    # area2 = box_area(boxes2)
+    area1 = (boxes1[..., 2] - boxes1[..., 0]) * (boxes1[..., 3] - boxes1[..., 1])
+    area2 = (boxes2[..., 2] - boxes2[..., 0]) * (boxes2[..., 3] - boxes2[..., 1])
 
     # import ipdb; ipdb.set_trace()
     # lt = torch.max(boxes1[:, None, :2], boxes2[:, :2])  # [N,M,2]
