@@ -26,13 +26,17 @@ def box_iou(boxes1, boxes2):
     area2 = box_area(boxes2)
 
     # import ipdb; ipdb.set_trace()
-    lt = torch.max(boxes1[:, None, :2], boxes2[:, :2])  # [N,M,2]
-    rb = torch.min(boxes1[:, None, 2:], boxes2[:, 2:])  # [N,M,2]
+    # lt = torch.max(boxes1[:, None, :2], boxes2[:, :2])  # [N,M,2]
+    # rb = torch.min(boxes1[:, None, 2:], boxes2[:, 2:])  # [N,M,2]
+    lt = torch.max(boxes1[..., :2].unsqueeze(-1), boxes2[..., :2].unsqueeze(-2))  # [N,M,2]
+    rb = torch.min(boxes1[..., 2:].unsqueeze(-1), boxes2[..., 2:].unsqueeze(-2))  # [N,M,2]
 
     wh = (rb - lt).clamp(min=0)  # [N,M,2]
-    inter = wh[:, :, 0] * wh[:, :, 1]  # [N,M]
+    # inter = wh[:, :, 0] * wh[:, :, 1]  # [N,M]
+    inter = wh[..., 0] * wh[..., 1]  # [N,M]
 
-    union = area1[:, None] + area2 - inter
+    # union = area1[:, None] + area2 - inter
+    union = area1.unsqueeze(-1) + area2.unsqueeze(-2) - inter
 
     iou = inter / (union + 1e-6)
     return iou, union

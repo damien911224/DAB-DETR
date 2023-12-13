@@ -184,7 +184,9 @@ class DABDETR(nn.Module):
             outputs_coord = torch.stack(outputs_coords)
 
         outputs_class = self.class_embed(hs)
-        out = {'pred_logits': outputs_class[-1], 'pred_boxes': outputs_coord[-1]}
+        # out = {'pred_logits': outputs_class[-1], 'pred_boxes': outputs_coord[-1]}
+        out = {'pred_logits': outputs_class[-1], 'pred_boxes': outputs_coord[-1],
+               'Q_weights': Q_weights, 'K_weights': K_weights, 'C_weights': C_weights}
         if self.aux_loss:
             out['aux_outputs'] = self._set_aux_loss(outputs_class, outputs_coord)
         return out
@@ -318,6 +320,93 @@ class SetCriterion(nn.Module):
         }
         return losses
 
+    def loss_QK(self, outputs, targets, indices, num_segments):
+        """Compute the losses related to the segmentes, the L1 regression loss and the IoU loss
+           targets dicts must contain the key "segments" containing a tensor of dim [nb_target_segments, 2]
+           The target segments are expected in format (center, width), normalized by the video length.
+        """
+
+        EPS = 0.0
+
+        src_segments = outputs['pred_boxes']
+        src_boundary = segment_ops.segment_cw_to_t1t2(src_segments)
+
+        losses = {}
+
+        tgt_QQ = box_ops.box_iou(src_boundary, src_boundary).softmax(dim=-1).detach()
+
+        C_weights = torch.mean(outputs["C_weights"], dim=0)
+
+        src_QQ = torch.sqrt(torch.bmm(C_weights, C_weights.transpose(1, 2)) + EPS)
+        src_QQ = (src_QQ / torch.sum(src_QQ, dim=-1, keepdim=True))
+
+        src_QQ = (src_QQ.flatten(0, 1) + EPS).log()
+        tgt_QQ = (tgt_QQ.flatten(0, 1) + EPS).log()
+
+        loss_QQ = F.kl_div(src_QQ, tgt_QQ, log_target=True, reduction="none").sum(-1).mean()
+
+        losses["loss_QK"] = loss_QQ
+
+        return losses
+
+    def loss_QQ(self, outputs, targets, indices, num_segments):
+        """Compute the actionness regression loss
+           targets dicts must contain the key "segments" containing a tensor of dim [nb_target_segments, 2]
+           The target segments are expected in format (center, width), normalized by the video length.
+        """
+        assert 'Q_weights' in outputs
+        assert 'C_weights' in outputs
+        assert 'pred_boxes' in outputs
+
+        EPS = 1.0e-12
+
+        src_segments = torch.cat((torch.stack([a_o['pred_boxes'] for a_o in outputs['aux_outputs']], dim=0),
+                                  outputs['pred_boxes'].unsqueeze(0)), dim=0)
+        src_boundary = box_ops.box_cxcywh_to_xyxy(src_segments.flatten(0, 1))
+
+        tgt_QQ = box_ops.box_iou(src_boundary, src_boundary).softmax(dim=-1).detach()
+
+        Q_weights = outputs["Q_weights"].flatten(0, 1)
+
+        src_QQ = (Q_weights.flatten(0, 1) + EPS).log()
+        tgt_QQ = (tgt_QQ.flatten(0, 1) + EPS).log()
+
+        losses = {}
+
+        loss_QQ = F.kl_div(src_QQ, tgt_QQ, log_target=True, reduction="none").sum(-1)
+        loss_QQ = loss_QQ.mean()
+
+        losses['loss_QQ'] = loss_QQ
+        return losses
+
+    def loss_KK(self, outputs, targets, indices, num_segments):
+        """Compute the actionness regression loss
+           targets dicts must contain the key "segments" containing a tensor of dim [nb_target_segments, 2]
+           The target segments are expected in format (center, width), normalized by the video length.
+        """
+        assert 'K_weights' in outputs
+        assert 'C_weights' in outputs
+
+        EPS = 0.0
+
+        C_weights = torch.mean(outputs["C_weights"], dim=0)
+        KK_weights = torch.bmm(C_weights.transpose(1, 2), C_weights)
+        KK_weights = torch.sqrt(KK_weights)
+        tgt_KK = (KK_weights / torch.sum(KK_weights, dim=-1, keepdim=True)).detach()
+
+        K_weights = torch.mean(outputs["K_weights"], dim=0)
+
+        src_KK = (K_weights.flatten(0, 1) + EPS).log()
+        tgt_KK = (tgt_KK.flatten(0, 1) + EPS).log()
+
+        losses = {}
+
+        loss_KK = F.kl_div(src_KK, tgt_KK, log_target=True, reduction="none").sum(-1)
+        loss_KK = loss_KK.mean()
+
+        losses['loss_KK'] = loss_KK
+        return losses
+
     def _get_src_permutation_idx(self, indices):
         # permute predictions following indices
         batch_idx = torch.cat([torch.full_like(src, i) for i, (src, _) in enumerate(indices)])
@@ -335,7 +424,10 @@ class SetCriterion(nn.Module):
             'labels': self.loss_labels,
             'cardinality': self.loss_cardinality,
             'boxes': self.loss_boxes,
-            'masks': self.loss_masks
+            'masks': self.loss_masks,
+            'QK': self.loss_QK,
+            "QQ": self.loss_QQ,
+            "KK": self.loss_KK,
         }
         assert loss in loss_map, f'do you really want to compute {loss} loss?'
         return loss_map[loss](outputs, targets, indices, num_boxes, **kwargs)
@@ -378,7 +470,7 @@ class SetCriterion(nn.Module):
                 if return_indices:
                     indices_list.append(indices)
                 for loss in self.losses:
-                    if loss == 'masks':
+                    if loss == 'masks' or 'QQ' in loss or 'KK' in loss or 'QK' in loss:
                         # Intermediate masks losses are too costly to compute, we ignore them.
                         continue
                     kwargs = {}
@@ -498,6 +590,12 @@ def build_DABDETR(args):
     losses = ['labels', 'boxes', 'cardinality']
     if args.masks:
         losses += ["masks"]
+
+    losses += ["QK", "QQ", "KK"]
+    weight_dict['loss_QK'] = 2.0
+    weight_dict['loss_QQ'] = 2.0
+    weight_dict['loss_KK'] = 2.0
+
     criterion = SetCriterion(num_classes, matcher=matcher, weight_dict=weight_dict,
                              focal_alpha=args.focal_alpha, losses=losses)
     criterion.to(device)

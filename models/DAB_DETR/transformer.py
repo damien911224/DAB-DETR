@@ -127,7 +127,7 @@ class Transformer(nn.Module):
         pos_embed = pos_embed.flatten(2).permute(2, 0, 1)
         refpoint_embed = refpoint_embed.unsqueeze(1).repeat(1, bs, 1)
         mask = mask.flatten(1)        
-        memory = self.encoder(src, src_key_padding_mask=mask, pos=pos_embed)
+        memory, K_weights = self.encoder(src, src_key_padding_mask=mask, pos=pos_embed)
 
         # query_embed = gen_sineembed_for_position(refpoint_embed)
         num_queries = refpoint_embed.shape[0]
@@ -137,9 +137,9 @@ class Transformer(nn.Module):
             tgt = self.patterns.weight[:, None, None, :].repeat(1, self.num_queries, bs, 1).flatten(0, 1) # n_q*n_pat, bs, d_model
             refpoint_embed = refpoint_embed.repeat(self.num_patterns, 1, 1) # n_q*n_pat, bs, d_model
             # import ipdb; ipdb.set_trace()
-        hs, references = self.decoder(tgt, memory, memory_key_padding_mask=mask,
+        hs, references, Q_weights, C_weights = self.decoder(tgt, memory, memory_key_padding_mask=mask,
                           pos=pos_embed, refpoints_unsigmoid=refpoint_embed)
-        return hs, references
+        return hs, references, Q_weights, K_weights, C_weights
 
 
 class TransformerEncoder(nn.Module):
@@ -157,16 +157,18 @@ class TransformerEncoder(nn.Module):
                 pos: Optional[Tensor] = None):
         output = src
 
+        inter_K_weights = list()
         for layer_id, layer in enumerate(self.layers):
             # rescale the content and pos sim
             pos_scales = self.query_scale(output)
             output = layer(output, src_mask=mask,
                            src_key_padding_mask=src_key_padding_mask, pos=pos*pos_scales)
+            inter_K_weights.append(K_weights)
 
         if self.norm is not None:
             output = self.norm(output)
 
-        return output
+        return output, torch.stack(inter_K_weights)
 
 
 class TransformerDecoder(nn.Module):
@@ -224,6 +226,8 @@ class TransformerDecoder(nn.Module):
         intermediate = []
         reference_points = refpoints_unsigmoid.sigmoid()
         ref_points = [reference_points]
+        inter_Q_weights = []
+        inter_C_weights = []
 
         # import ipdb; ipdb.set_trace()        
 
@@ -274,6 +278,8 @@ class TransformerDecoder(nn.Module):
 
             if self.return_intermediate:
                 intermediate.append(self.norm(output))
+                inter_Q_weights.append(Q_weights)
+                inter_C_weights.append(C_weights)
 
         if self.norm is not None:
             output = self.norm(output)
@@ -286,6 +292,8 @@ class TransformerDecoder(nn.Module):
                 return [
                     torch.stack(intermediate).transpose(1, 2),
                     torch.stack(ref_points).transpose(1, 2),
+                    torch.stack(inter_Q_weights),
+                    torch.stack(inter_C_weights),
                 ]
             else:
                 return [
@@ -385,7 +393,7 @@ class TransformerEncoderLayer(nn.Module):
         src2 = self.linear2(self.dropout(self.activation(self.linear1(src))))
         src = src + self.dropout2(src2)
         src = self.norm2(src)
-        return src
+        return src, K_weights
 
 
 class TransformerDecoderLayer(nn.Module):
@@ -490,36 +498,36 @@ class TransformerDecoderLayer(nn.Module):
             #
             # print(Q_C.detach().cpu().numpy(), Q_P.detach().cpu().numpy())
 
-            global layer_count
-            layer_count += 1
-            Q_weights = Q_weights[0].detach().cpu()
-
-            # map = Q_weights.view(30, 30, 30, 30).mean(dim=1).sum(dim=2)
-            # map = Q_weights.view(3, 10, 10, 3, 10, 10).mean(dim=(0, 1)).sum(dim=(1, 2))
-            # map = Q_weights.view(3, 100, 3, 100).mean(dim=0).sum(dim=1)
-            # map = map / torch.sum(map, dim=-1, keepdim=True)
-            map = Q_weights[:40, :40]
-            # # map = K_weights.view(25, 34, 25, 34).mean(dim=1).sum(dim=2)
-            # map = map / torch.sum(map, dim=-1, keepdim=True)
-            # map = Q_weights
-
-            map = map.numpy()
-
-            H, W = map.shape
-            H_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
-            W_labels = ["{}".format(x) for x in range(1, W + 1, 1)]
-            # map -= np.min(map)
-            # map /= np.max(map)
+            # global layer_count
+            # layer_count += 1
+            # Q_weights = Q_weights[0].detach().cpu()
+            #
+            # # map = Q_weights.view(30, 30, 30, 30).mean(dim=1).sum(dim=2)
+            # # map = Q_weights.view(3, 10, 10, 3, 10, 10).mean(dim=(0, 1)).sum(dim=(1, 2))
+            # # map = Q_weights.view(3, 100, 3, 100).mean(dim=0).sum(dim=1)
+            # # map = map / torch.sum(map, dim=-1, keepdim=True)
+            # map = Q_weights[:40, :40]
+            # # # map = K_weights.view(25, 34, 25, 34).mean(dim=1).sum(dim=2)
+            # # map = map / torch.sum(map, dim=-1, keepdim=True)
+            # # map = Q_weights
+            #
+            # map = map.numpy()
+            #
+            # H, W = map.shape
+            # H_labels = ["{}".format(x) for x in range(1, H + 1, 1)]
+            # W_labels = ["{}".format(x) for x in range(1, W + 1, 1)]
+            # # map -= np.min(map)
+            # # map /= np.max(map)
+            # # df = pd.DataFrame(map, H_labels, W_labels)
             # df = pd.DataFrame(map, H_labels, W_labels)
-            df = pd.DataFrame(map, H_labels, W_labels)
-            ax = sn.heatmap(df, cbar=True, xticklabels=False, yticklabels=False, square=True)
-            # ax.set(xlabel="", ylabel="")
-            # tl = ax.get_xticklabels()
-            # ax.set_xticklabels(tl, rotation=90)
-            # tly = ax.get_yticklabels()
-            # ax.set_yticklabels(tly, rotation=0)
-            plt.savefig("Q_{:02d}.png".format(layer_count))
-            plt.close()
+            # ax = sn.heatmap(df, cbar=True, xticklabels=False, yticklabels=False, square=True)
+            # # ax.set(xlabel="", ylabel="")
+            # # tl = ax.get_xticklabels()
+            # # ax.set_xticklabels(tl, rotation=90)
+            # # tly = ax.get_yticklabels()
+            # # ax.set_yticklabels(tly, rotation=0)
+            # plt.savefig("Q_{:02d}.png".format(layer_count))
+            # plt.close()
 
             tgt = tgt + self.dropout1(tgt2)
             tgt = self.norm1(tgt)
@@ -554,10 +562,10 @@ class TransformerDecoderLayer(nn.Module):
         k_pos = k_pos.view(hw, bs, self.nhead, n_model//self.nhead)
         k = torch.cat([k, k_pos], dim=3).view(hw, bs, n_model * 2)
 
-        tgt2 = self.cross_attn(query=q,
-                               key=k,
-                               value=v, attn_mask=memory_mask,
-                               key_padding_mask=memory_key_padding_mask)[0]
+        tgt2, C_weights = self.cross_attn(query=q,
+                                          key=k,
+                                          value=v, attn_mask=memory_mask,
+                                          key_padding_mask=memory_key_padding_mask)
         # ========== End of Cross-Attention =============
 
         tgt = tgt + self.dropout2(tgt2)
@@ -565,7 +573,7 @@ class TransformerDecoderLayer(nn.Module):
         tgt2 = self.linear2(self.dropout(self.activation(self.linear1(tgt))))
         tgt = tgt + self.dropout3(tgt2)
         tgt = self.norm3(tgt)
-        return tgt
+        return tgt, Q_weights, C_weights
 
 
 
