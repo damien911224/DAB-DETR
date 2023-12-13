@@ -155,7 +155,7 @@ def get_args_parser():
     parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
                         help='start epoch')
     parser.add_argument('--eval', action='store_true', help="eval only. w/o Training.")
-    parser.add_argument('--num_workers', default=16, type=int)
+    parser.add_argument('--num_workers', default=10, type=int)
     parser.add_argument('--debug', action='store_true', 
                         help="For debug only. It will perform only a few steps during trainig and val.")
     parser.add_argument('--find_unused_params', action='store_true')
