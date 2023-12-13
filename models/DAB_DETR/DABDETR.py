@@ -331,7 +331,7 @@ class SetCriterion(nn.Module):
 
         losses = {}
 
-        tgt_QQ = box_ops.box_iou(src_boundary, src_boundary).softmax(dim=-1).detach()
+        tgt_QQ = box_ops.box_iou(src_boundary, src_boundary)[0].softmax(dim=-1).detach()
 
         C_weights = torch.mean(outputs["C_weights"], dim=0)
 
@@ -362,7 +362,7 @@ class SetCriterion(nn.Module):
                                   outputs['pred_boxes'].unsqueeze(0)), dim=0)
         src_boundary = box_ops.box_cxcywh_to_xyxy(src_segments.flatten(0, 1))
 
-        tgt_QQ = box_ops.box_iou(src_boundary, src_boundary).softmax(dim=-1).detach()
+        tgt_QQ = box_ops.box_iou(src_boundary, src_boundary)[0].softmax(dim=-1).detach()
 
         Q_weights = outputs["Q_weights"].flatten(0, 1)
 
