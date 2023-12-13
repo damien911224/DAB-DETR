@@ -161,7 +161,7 @@ class TransformerEncoder(nn.Module):
         for layer_id, layer in enumerate(self.layers):
             # rescale the content and pos sim
             pos_scales = self.query_scale(output)
-            output = layer(output, src_mask=mask,
+            output, K_weights = layer(output, src_mask=mask,
                            src_key_padding_mask=src_key_padding_mask, pos=pos*pos_scales)
             inter_K_weights.append(K_weights)
 
