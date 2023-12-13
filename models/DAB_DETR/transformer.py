@@ -256,7 +256,7 @@ class TransformerDecoder(nn.Module):
                 query_sine_embed[..., :self.d_model // 2] *= (refHW_cond[..., 1] / obj_center[..., 3]).unsqueeze(-1)
 
 
-            output = layer(output, memory, tgt_mask=tgt_mask,
+            output, Q_weights, C_weights = layer(output, memory, tgt_mask=tgt_mask,
                            memory_mask=memory_mask,
                            tgt_key_padding_mask=tgt_key_padding_mask,
                            memory_key_padding_mask=memory_key_padding_mask,
