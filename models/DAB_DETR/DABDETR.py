@@ -327,7 +327,7 @@ class SetCriterion(nn.Module):
         EPS = 0.0
 
         src_segments = outputs['pred_boxes']
-        src_boundary = segment_ops.segment_cw_to_t1t2(src_segments)
+        src_boundary = box_ops.box_cxcywh_to_xyxy(src_segments)
 
         losses = {}
 
