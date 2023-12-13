@@ -385,7 +385,7 @@ class SetCriterion(nn.Module):
         assert 'K_weights' in outputs
         assert 'C_weights' in outputs
 
-        EPS = 0.0
+        EPS = 1.0e-12
 
         C_weights = torch.mean(outputs["C_weights"], dim=0)
         KK_weights = torch.bmm(C_weights.transpose(1, 2), C_weights)
