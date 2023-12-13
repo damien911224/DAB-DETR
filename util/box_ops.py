@@ -36,7 +36,7 @@ def box_iou(boxes1, boxes2):
     inter = wh[..., 0] * wh[..., 1]  # [N,M]
 
     # union = area1[:, None] + area2 - inter
-    union = area1.unsqueeze(-2) + area2.unsqueeze(-3) - inter
+    union = area1.unsqueeze(-1) + area2.unsqueeze(-2) - inter
 
     iou = inter / (union + 1e-6)
     return iou, union
