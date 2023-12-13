@@ -385,12 +385,12 @@ class SetCriterion(nn.Module):
         assert 'K_weights' in outputs
         assert 'C_weights' in outputs
 
-        EPS = 1.0e-8
+        EPS = 1.0e-12
 
         C_weights = torch.mean(outputs["C_weights"], dim=0)
         KK_weights = torch.bmm(C_weights.transpose(1, 2), C_weights)
         KK_weights = torch.sqrt(KK_weights)
-        tgt_KK = (KK_weights / torch.sum(KK_weights, dim=-1, keepdim=True)).detach()
+        tgt_KK = (KK_weights / (torch.sum(KK_weights, dim=-1, keepdim=True) + EPS)).detach()
 
         K_weights = torch.mean(outputs["K_weights"], dim=0)
 
